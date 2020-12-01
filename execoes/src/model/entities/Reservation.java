@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entities;
+package model.entities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import model.exceptions.DomainException;
 
 /**
  *
@@ -22,7 +23,10 @@ public class Reservation {
         
     }private static SimpleDateFormat sdf= new SimpleDateFormat("dd/MM/yyyy");
 
-    public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
+    public Reservation(Integer roomNumber, Date checkIn, Date checkOut) throws DomainException{
+        if (checkOut.before(checkIn)) {
+                throw new DomainException("Error in reservation: Check-Out dates  must be after check-In date");
+            }
         this.roomNumber = roomNumber;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
@@ -52,17 +56,18 @@ public class Reservation {
         return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }   
     
-    public String updateDates(Date checkIn, Date checkOut){
+    public void updateDates(Date checkIn, Date checkOut) throws DomainException{
         Date now = new Date();
             if (checkIn.before(now) || checkOut.before(now)) {
-                return "reservation: Reservation dates for update must be future dates";
+                throw new DomainException("reservation: Reservation dates for update must be future dates");
+                
             }
             if (checkOut.before(checkIn)) {
-                return "Error in reservation: Check-Out dates  must be after check-In date";
+                throw new DomainException("Error in reservation: Check-Out dates  must be after check-In date");
             }
         this.checkIn = checkIn;
         this.checkOut = checkOut;
-        return null;
+        
     }
     @Override
     public String toString(){
